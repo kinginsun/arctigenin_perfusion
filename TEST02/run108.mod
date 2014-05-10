@@ -1,0 +1,61 @@
+;; 1. Based on: 
+;; 2. Description: 1-comp iv, MM elim
+;; 3. Label:
+;; x1. Author: user
+
+$PROBLEM PK
+
+$INPUT ID TIME DV AMT CMT MDV EVID
+
+$DATA nm_001.csv ; IGNORE=@
+
+$SUBROUTINES ADVAN6 TRANS1 TOL=5
+
+$MODEL
+  COMP=(CENTRAL)
+  COMP=(PERIPH)
+
+$PK
+  V1   = THETA(1) * EXP(ETA(1))
+  V2   = THETA(2)
+  Q    = THETA(3) * EXP(ETA(2))
+  K12  = Q/V1
+  K21  = Q/V2
+  S1   = V1
+  VM   = THETA(4)
+  KM   = THETA(5) * EXP(ETA(3))
+
+$DES
+  CONC=A(1)/V1
+  DADT(1) = -VM*CONC/(KM+CONC) - K12*A(1) + K21*A(1)
+  DADT(2) = K12*A(1) - K21*A(2)
+
+$ERROR
+IPRED = F
+    W = SQRT(THETA(6)**2*IPRED**2 + THETA(7)**2)
+    Y = IPRED + W*EPS(1)
+ IRES = DV-IPRED
+IWRES = IRES/W
+
+$THETA
+(0,1) ; V1
+(0,1) ; V2
+(0,1) ; Q
+(0,1) ; VMAX
+(0,1) ; KM
+(0, .1) ; Prop.RE (sd)
+(0, 1)  ; Add.RE (sd)
+
+$OMEGA
+(0.1) ; IIV V1
+(0.1) ; IIV Q
+(0.1) ; IIV KM
+
+$SIGMA
+1 FIX ;  Proportional error PK
+
+$EST METHOD=1 INTER MAXEVAL=2000 NOABORT SIG=3 PRINT=1 POSTHOC
+$COV
+
+$TABLE ID TIME DV MDV EVID IPRED IWRES ONEHEADER NOPRINT  FILE=sdtab005
+$TABLE CL V1 V2 VM KM FIRSTONLY ONEHEADER NOPRINT FILE=patab005

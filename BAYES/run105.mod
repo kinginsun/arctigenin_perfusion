@@ -1,0 +1,25 @@
+;; 1. Based on: run102
+;; 2. Description: single function
+;; x1. Author: user
+;; 3. Label:
+$PROB BAYES TEST 
+
+$DATA OLSID.CSV IGNORE=# 
+
+$INPUT ID TIME OBS=DV
+
+$PRED 
+K = THETA(1) + ETA(1) 
+F = 10*EXP(-K*TIME) 
+IPRED = F 
+Y = F + ERR(1) 
+
+$THETA 0.01 ; K
+
+$OMEGA 4 ; ETA(1)
+
+$SIGMA 0.04 ; ERR(1)
+
+$ESTIMATE MAXEVALS=0 METHOD=COND SLOW
+
+$TABLE ID TIME K IPRED ETA1 NOPRINT NOAPPEND ONEHEADER FILE=patab105.tab

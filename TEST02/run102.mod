@@ -1,0 +1,46 @@
+;; 1. Based on: run100
+;; 2. Description: 1-comp iv, linear elim Single Subject
+;; x1. Author: user
+
+
+;; 3. Label:
+
+$PROBLEM PK
+
+$INPUT ID TIME DV AMT MDV
+
+$DATA one_cmp.csv ; IGNORE=@
+
+$SUBROUTINES ADVAN1 TRANS2
+
+$PK
+CL = THETA(1)*EXP(ETA(1))
+V  = THETA(2)*EXP(ETA(2))
+S1 = V
+
+$ERROR
+IPRED = F
+;W = SQRT(THETA(3)**2*IPRED**2 + THETA(4)**2)
+;Y = IPRED + W*EPS(1)
+Y=IPRED+EPS(1)
+IRES = DV-IPRED
+;IWRES = IRES/W
+IWRES=IRES
+
+$THETA
+(0, 76.5) ; CL
+(0, 1010) ; V
+
+$OMEGA
+0.00001 ; IIV CL
+0.00001 ; IIV V1
+
+$SIGMA
+1 FIX   ; Residual error
+
+$EST METHOD=1 MAXEVAL=2000 NOABORT SIG=7 PRINT=5
+
+; Xpose
+$TABLE ID TIME DV MDV EVID IPRED IWRES ONEHEADER NOPRINT FILE=sdtab001
+$TABLE CL V ONEHEADER NOPRINT FIRSTONLY FILE=patab001
+

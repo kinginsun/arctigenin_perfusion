@@ -1,0 +1,44 @@
+;; 1. Based on: run106
+;; 2. Description: 1-comp iv, linear elim BAYES
+;; x1. Author: user
+;; 3. Label:
+
+$PROBLEM PK
+
+$INPUT ID TIME DV AMT MDV
+
+$DATA one_cmp_simulated1.csv ; IGNORE=@
+
+$SUBROUTINES ADVAN1 TRANS2
+
+$PK
+CL = THETA(1)+ETA(1)
+V  = THETA(2)+ETA(2)
+S1 = V
+
+$ERROR
+IPRED = F
+;W = SQRT(THETA(3)**2*IPRED**2 + THETA(4)**2)
+;Y = IPRED + W*EPS(1)
+Y=IPRED+EPS(1)
+IRES = DV-IPRED
+;IWRES = IRES/W
+IWRES=IRES
+
+$THETA
+(0, 76.5) ; CL
+(0, 1010) ; V
+
+$OMEGA
+0.00001 ; IIV CL
+0.00001 ; IIV V1
+
+$SIGMA
+1   ; Residual error
+
+$EST MAXEVAL=2000 NOABORT SIG=7 PRINT=5
+
+; Xpose
+$TABLE ID TIME DV MDV EVID IPRED IWRES ONEHEADER NOPRINT FILE=sdtab001
+$TABLE CL V ONEHEADER NOPRINT FIRSTONLY FILE=patab001
+
